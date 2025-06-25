@@ -1,4 +1,4 @@
-# streamlit_pet_app.py (변화 원인 주석 + 표 표시 추가)
+# streamlit_pet_app.py (Cloud 호환 .joblib 파일 로딩으로 수정됨)
 import streamlit as st
 import pandas as pd
 import joblib
@@ -10,11 +10,9 @@ from matplotlib import rcParams
 from datetime import datetime
 import os
 
-# --- 한글 폰트 설정 ---
 plt.rcParams["font.family"] = "Malgun Gothic"
 rcParams.update({'axes.titlesize': 12, 'axes.labelsize': 10, 'xtick.labelsize': 8, 'ytick.labelsize': 8})
 
-# --- DMS → Decimal 변환 함수 ---
 def dms_to_decimal(dms_str):
     try:
         d, m, s = map(float, dms_str.split(";"))
@@ -30,7 +28,8 @@ def load_data():
     df["lon_decimal"] = df["lon"].apply(dms_to_decimal)
     return df
 
-model = joblib.load("pet_rf_model_trained.pkl")
+# ✅ Cloud 호환 .joblib 파일 사용
+model = joblib.load("pet_rf_model_trained.joblib")
 df = load_data()
 LOG_FILE = "pet_prediction_log.csv"
 if not os.path.exists(LOG_FILE):
@@ -128,13 +127,10 @@ with col2:
             fig, ax = plt.subplots()
             ax.plot(time_now, recent["PET"], marker='o', label="현재 PET")
             ax.plot(time_future, recent["PET_future"], marker='x', linestyle="--", label="선택 시간 PET")
-
-            # 각 점에 원인 주석 추가 (기온, 습도, 풍속)
             for i in range(len(recent)):
                 ax.annotate(f"T={recent['Temp'].iloc[i]:.1f}\nRH={recent['Humidity'].iloc[i]:.0f}%\nWS={recent['Wind'].iloc[i]:.1f}m/s",
                             (time_future.iloc[i], recent["PET_future"].iloc[i]),
                             textcoords="offset points", xytext=(0,8), ha='center', fontsize=8, color='gray')
-
             ax.set_ylabel("PET (°C)")
             ax.set_xlabel("시간")
             ax.set_title("PET 변화 추이 (현재 vs 선택 시간)")
@@ -142,7 +138,6 @@ with col2:
             ax.grid(True)
             st.pyplot(fig)
 
-            # 변화 원인 표 출력
             with st.expander("🔍 변화 원인 상세 보기"):
                 st.dataframe(recent[["timestamp", "PET", "PET_future", "Temp", "Humidity", "Wind", "SVF", "GVI", "BVI"]])
     else:

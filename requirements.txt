@@ -1,0 +1,8 @@
+streamlit
+pandas
+joblib
+openpyxl
+matplotlib
+requests
+folium
+streamlit-folium

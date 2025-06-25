@@ -1,4 +1,4 @@
-# streamlit_pet_app.py (Cloud 호환 .joblib 파일 로딩으로 수정됨)
+# streamlit_pet_app.py (joblib 모델 로딩 최종 수정)
 import streamlit as st
 import pandas as pd
 import joblib
@@ -28,7 +28,7 @@ def load_data():
     df["lon_decimal"] = df["lon"].apply(dms_to_decimal)
     return df
 
-# ✅ Cloud 호환 .joblib 파일 사용
+# ✅ Cloud 호환 모델 파일 로딩
 model = joblib.load("pet_rf_model_trained.joblib")
 df = load_data()
 LOG_FILE = "pet_prediction_log.csv"
@@ -142,3 +142,4 @@ with col2:
                 st.dataframe(recent[["timestamp", "PET", "PET_future", "Temp", "Humidity", "Wind", "SVF", "GVI", "BVI"]])
     else:
         st.info("지도를 클릭해서 위치를 선택하세요.")
+ 
